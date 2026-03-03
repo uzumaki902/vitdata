@@ -1,0 +1,324 @@
+Perfect — for pure frontend, you can still “feel” like a real product by doing 3 things:
+
+Polish UI (minimal)
+
+Micro-UX (validation, states, feedback)
+
+Clean structure + reusable components
+
+Below is an “impress recruiter” blueprint.
+
+UI Theme (60/30/10) that looks premium
+
+60%: background #F6F7FB
+30%: surfaces/cards #FFFFFF
+10%: accent (one color only) #4F46E5
+
+Extras:
+
+Text: #0F172A
+
+Muted: #64748B
+
+Borders: #E2E8F0
+
+Recruiter-impressing UX checklist
+Login Screen
+
+✅ Email format validation (live)
+✅ Password min length check (e.g., 4+)
+✅ Login button disabled until valid
+✅ “Loading…” state for 700ms (fake, but feels real)
+✅ Error message inline (small, clean)
+✅ Keyboard handling (no overlap)
+
+Dashboard
+
+✅ Profile card (name + email)
+✅ Detail rows (Age, Email)
+✅ “Logout” button (top right)
+✅ Smooth spacing + alignment
+✅ Clean typography hierarchy
+
+Clean structure (looks professional)
+app/
+  index.js
+  dashboard.js
+components/
+  AppButton.js
+  AppInput.js
+  Card.js
+theme/
+  colors.js
+
+Even if project is small, structure makes you look senior.
+
+Drop-in Code (minimal + premium)
+theme/colors.js
+export const COLORS = {
+  base: "#F6F7FB",     // 60%
+  surface: "#FFFFFF",  // 30%
+  accent: "#4F46E5",   // 10%
+  text: "#0F172A",
+  muted: "#64748B",
+  border: "#E2E8F0",
+  danger: "#DC2626",
+  inputBg: "#F1F5F9",
+};
+components/Card.js
+import { View, StyleSheet } from "react-native";
+import { COLORS } from "../theme/colors";
+
+export default function Card({ children, style }) {
+  return <View style={[styles.card, style]}>{children}</View>;
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+});
+components/AppInput.js
+import { View, Text, TextInput, StyleSheet } from "react-native";
+import { COLORS } from "../theme/colors";
+
+export default function AppInput({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  secureTextEntry,
+  keyboardType,
+  error,
+}) {
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        autoCapitalize="none"
+        style={[styles.input, !!error && styles.inputError]}
+      />
+      {!!error && <Text style={styles.err}>{error}</Text>}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  label: { fontSize: 13, color: COLORS.muted, marginBottom: 6 },
+  input: {
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  inputError: { borderColor: COLORS.danger },
+  err: { color: COLORS.danger, marginTop: 6, fontSize: 12 },
+});
+components/AppButton.js
+import { Pressable, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { COLORS } from "../theme/colors";
+
+export default function AppButton({ title, onPress, disabled, loading }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || loading}
+      style={[
+        styles.btn,
+        (disabled || loading) && styles.btnDisabled,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator />
+      ) : (
+        <Text style={styles.txt}>{title}</Text>
+      )}
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  btn: {
+    backgroundColor: COLORS.accent,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  btnDisabled: { opacity: 0.6 },
+  txt: { color: "white", fontWeight: "700", fontSize: 16 },
+});
+Login (with validation + loading + clean UX)
+app/index.js
+import { useMemo, useState } from "react";
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { useRouter } from "expo-router";
+import Card from "../components/Card";
+import AppInput from "../components/AppInput";
+import AppButton from "../components/AppButton";
+import { COLORS } from "../theme/colors";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export default function Login() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState({ email: false, pass: false });
+
+  const errors = useMemo(() => {
+    const e = {};
+    if (touched.email && !emailRegex.test(email.trim())) e.email = "Enter a valid email";
+    if (touched.pass && pass.length < 4) e.pass = "Minimum 4 characters";
+    return e;
+  }, [email, pass, touched]);
+
+  const canLogin = emailRegex.test(email.trim()) && pass.length >= 4 && !loading;
+
+  const onLogin = async () => {
+    setLoading(true);
+
+    // Fake realistic delay
+    await new Promise((r) => setTimeout(r, 700));
+
+    // Dummy user data (pure frontend)
+    router.push({
+      pathname: "/dashboard",
+      params: { name: "Sai", email: email.trim(), age: "21" },
+    });
+
+    setLoading(false);
+  };
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.page}
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>Sign in</Text>
+        <Text style={styles.sub}>Minimal, clean, and fast.</Text>
+      </View>
+
+      <Card>
+        <AppInput
+          label="Email"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          error={errors.email}
+        />
+        <AppInput
+          label="Password"
+          value={pass}
+          onChangeText={setPass}
+          placeholder="••••"
+          secureTextEntry
+          error={errors.pass}
+        />
+
+        <AppButton
+          title="Login"
+          onPress={onLogin}
+          disabled={!canLogin}
+          loading={loading}
+        />
+
+        <Text style={styles.hint}>
+          Tip: use <Text style={styles.bold}>test@mail.com</Text> and any 4+ char password.
+        </Text>
+
+        {/* touch tracking */}
+        <View style={{ height: 0 }}
+          onTouchStart={() => setTouched({ email: true, pass: true })}
+        />
+      </Card>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: COLORS.base, padding: 20, justifyContent: "center" },
+  header: { marginBottom: 16 },
+  title: { fontSize: 26, fontWeight: "800", color: COLORS.text },
+  sub: { marginTop: 6, color: COLORS.muted },
+  hint: { marginTop: 12, color: COLORS.muted, fontSize: 12 },
+  bold: { color: COLORS.text, fontWeight: "700" },
+});
+Dashboard (profile card + logout)
+app/dashboard.js
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import Card from "../components/Card";
+import { COLORS } from "../theme/colors";
+
+export default function Dashboard() {
+  const router = useRouter();
+  const { name, email, age } = useLocalSearchParams();
+
+  return (
+    <View style={styles.page}>
+      <View style={styles.top}>
+        <Text style={styles.title}>Dashboard</Text>
+        <Pressable onPress={() => router.replace("/")}>
+          <Text style={styles.logout}>Logout</Text>
+        </Pressable>
+      </View>
+
+      <Text style={styles.sub}>Account details</Text>
+
+      <Card style={{ marginBottom: 14 }}>
+        <Text style={styles.big}>{name || "User"}</Text>
+        <Text style={styles.muted}>{email || "-"}</Text>
+      </Card>
+
+      <Card>
+        <Row k="Email" v={email || "-"} />
+        <Row k="Age" v={age || "-"} />
+      </Card>
+    </View>
+  );
+}
+
+function Row({ k, v }) {
+  return (
+    <View style={styles.row}>
+      <Text style={styles.k}>{k}</Text>
+      <Text style={styles.v}>{v}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: COLORS.base, padding: 20, paddingTop: 60 },
+  top: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  title: { fontSize: 26, fontWeight: "800", color: COLORS.text },
+  logout: { color: COLORS.accent, fontWeight: "700" },
+  sub: { marginTop: 6, color: COLORS.muted, marginBottom: 18 },
+
+  big: { fontSize: 20, fontWeight: "800", color: COLORS.text },
+  muted: { marginTop: 6, color: COLORS.muted },
+
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  k: { color: COLORS.muted, fontWeight: "600" },
+  v: { color: COLORS.text, fontWeight: "700" },
+});

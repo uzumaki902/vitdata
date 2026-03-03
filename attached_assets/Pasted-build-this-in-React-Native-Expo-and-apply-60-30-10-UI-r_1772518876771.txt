@@ -1,0 +1,228 @@
+build this in React Native + Expo and apply 60/30/10 UI rule.
+
+1) App flow (simple)
+
+Login Screen: email + password + login button
+
+On success → Dashboard Screen
+
+Dashboard shows: Name, Email, Age
+
+For now you can use dummy login (hardcoded user) unless backend is given.
+
+2) 60/30/10 UI rule (how to apply here)
+
+60% = Base / Background
+
+Use a soft neutral: #F6F7FB (light grey) or #FFFFFF
+
+Most of the screen stays this color.
+
+30% = Secondary (cards, surfaces, sections)
+
+Use white cards on grey background OR light tint blocks.
+
+Example card bg: #FFFFFF with shadow + rounded corners.
+
+10% = Accent (buttons, highlights, focus states)
+
+Use 1 strong color only for actions: e.g. #4F46E5 (indigo)
+
+Login button, active input border, small icons.
+
+Rule: Don’t use accent for everything—only “important action”.
+
+3) Recommended layout + spacing
+
+Use one main card in login (clean)
+
+Use 2–3 cards in dashboard (profile + info)
+
+Spacing: 16 or 20 consistently
+
+Border radius: 12–16
+
+Font sizes: Title 22–24, labels 12–14, inputs 16
+
+4) Minimal Expo setup (navigation)
+
+Use expo-router (best with Expo) OR React Navigation.
+I’ll give you expo-router way (cleaner).
+
+Folder structure
+app/
+  index.js           (Login)
+  dashboard.js       (Dashboard)
+Install
+npx expo install expo-router react-native-safe-area-context react-native-screens
+5) Code (Login + Dashboard) with 60/30/10 styling
+app/index.js (Login)
+import { useState } from "react";
+import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+
+export default function Login() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [error, setError] = useState("");
+
+  const onLogin = () => {
+    // Dummy auth (replace with real API later)
+    if (email.trim() === "test@mail.com" && pass === "1234") {
+      setError("");
+      router.push({
+        pathname: "/dashboard",
+        params: { name: "Sai", email: email.trim(), age: "21" },
+      });
+    } else {
+      setError("Invalid email or password");
+    }
+  };
+
+  return (
+    <View style={styles.page}>
+      <Text style={styles.title}>Welcome back</Text>
+      <Text style={styles.sub}>Login to continue</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          value={email}
+          onChangeText={setEmail}
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          style={styles.input}
+        />
+
+        <Text style={[styles.label, { marginTop: 12 }]}>Password</Text>
+        <TextInput
+          value={pass}
+          onChangeText={setPass}
+          placeholder="••••"
+          secureTextEntry
+          style={styles.input}
+        />
+
+        {!!error && <Text style={styles.error}>{error}</Text>}
+
+        <Pressable style={styles.btn} onPress={onLogin}>
+          <Text style={styles.btnText}>Login</Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+const COLORS = {
+  base: "#F6F7FB",     // 60%
+  surface: "#FFFFFF",  // 30%
+  accent: "#4F46E5",   // 10%
+  text: "#0F172A",
+  muted: "#64748B",
+};
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: COLORS.base,
+    padding: 20,
+    justifyContent: "center",
+  },
+  title: { fontSize: 24, fontWeight: "700", color: COLORS.text },
+  sub: { marginTop: 6, color: COLORS.muted, marginBottom: 18 },
+
+  card: {
+    backgroundColor: COLORS.surface,
+    padding: 18,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  label: { fontSize: 13, color: COLORS.muted, marginBottom: 6 },
+  input: {
+    backgroundColor: "#F1F5F9",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  error: { color: "#DC2626", marginTop: 10, fontSize: 13 },
+
+  btn: {
+    marginTop: 16,
+    backgroundColor: COLORS.accent,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  btnText: { color: "white", fontWeight: "700", fontSize: 16 },
+});
+app/dashboard.js (Dashboard)
+import { View, Text, StyleSheet } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+
+export default function Dashboard() {
+  const { name, email, age } = useLocalSearchParams();
+
+  return (
+    <View style={styles.page}>
+      <Text style={styles.title}>Dashboard</Text>
+      <Text style={styles.sub}>Account details</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.big}>{name || "User"}</Text>
+        <Text style={styles.muted}>{email || "-"}</Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.row}><Text style={styles.k}>Email: </Text>{email || "-"}</Text>
+        <Text style={styles.row}><Text style={styles.k}>Age: </Text>{age || "-"}</Text>
+      </View>
+    </View>
+  );
+}
+
+const COLORS = {
+  base: "#F6F7FB",
+  surface: "#FFFFFF",
+  accent: "#4F46E5",
+  text: "#0F172A",
+  muted: "#64748B",
+};
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: COLORS.base, padding: 20, paddingTop: 60 },
+  title: { fontSize: 24, fontWeight: "700", color: COLORS.text },
+  sub: { marginTop: 6, color: COLORS.muted, marginBottom: 18 },
+
+  card: {
+    backgroundColor: COLORS.surface,
+    padding: 18,
+    borderRadius: 16,
+    marginBottom: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  big: { fontSize: 20, fontWeight: "700", color: COLORS.text },
+  muted: { marginTop: 6, color: COLORS.muted },
+
+  row: { fontSize: 16, color: COLORS.text, marginTop: 8 },
+  k: { color: COLORS.muted, fontWeight: "600" },
+});
+6) Extra UX polish (small but impressive)
+
+Disable button if email/pass empty
+
+Add loading spinner on login
+
+Add “show password” toggle
+
+Validate email format
