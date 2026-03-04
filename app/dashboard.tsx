@@ -8,15 +8,31 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
 import Card from "@/components/Card";
 import AppButton from "@/components/AppButton";
 import { COLORS } from "@/constants/colors";
 import * as Haptics from "expo-haptics";
 
-function DocRow({ label, value }: { label: string; value: string }) {
+function StatCard({ icon, label, value }: { icon: string; label: string; value: string }) {
+  return (
+    <View style={styles.statCard}>
+      <View style={styles.statIconWrap}>
+        <Feather name={icon as any} size={16} color={COLORS.accent} />
+      </View>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function DocRow({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <View style={styles.docRow}>
-      <Text style={styles.docLabel}>{label}</Text>
+      <View style={styles.docLeft}>
+        <Feather name={icon as any} size={14} color={COLORS.muted} />
+        <Text style={styles.docLabel}>{label}</Text>
+      </View>
       <Text style={styles.docValue}>{value}</Text>
     </View>
   );
@@ -39,6 +55,7 @@ export default function DashboardScreen() {
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
 
   const initial = (name ?? "U").charAt(0).toUpperCase();
+  const displayName = name ?? "User";
 
   const handleLogout = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -54,11 +71,20 @@ export default function DashboardScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
+      {/* Greeting header */}
       <View style={styles.pageHeader}>
-        <Text style={styles.pageTitle}>Dashboard</Text>
-        <Text style={styles.pageSubtitle}>Account</Text>
+        <Text style={styles.greeting}>Welcome back,</Text>
+        <Text style={styles.pageTitle}>{displayName} </Text>
       </View>
 
+      {/* Quick stats row */}
+      <View style={styles.statsRow}>
+        <StatCard icon="shield" label="Status" value="Active" />
+        <StatCard icon="clock" label="Member" value="New" />
+        <StatCard icon="star" label="Plan" value="Free" />
+      </View>
+
+      {/* Profile section */}
       <SectionTitle>Profile</SectionTitle>
 
       <Card style={styles.profileCard}>
@@ -67,22 +93,29 @@ export default function DashboardScreen() {
             <Text style={styles.avatarText}>{initial}</Text>
           </View>
           <View style={styles.profileText}>
-            <Text style={styles.profileName}>{name ?? "User"}</Text>
+            <Text style={styles.profileName}>{displayName}</Text>
             <Text style={styles.profileEmail}>{email ?? "-"}</Text>
+          </View>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>Verified</Text>
           </View>
         </View>
       </Card>
 
-      <SectionTitle>Details</SectionTitle>
+      {/* Details section */}
+      <SectionTitle>Account Details</SectionTitle>
 
       <Card style={styles.detailsCard}>
-        <DocRow label="Email" value={email ?? "-"} />
+        <DocRow icon="mail" label="Email" value={email ?? "-"} />
         <View style={styles.rowDivider} />
-        <DocRow label="Age" value={age ?? "-"} />
+        <DocRow icon="user" label="Name" value={displayName} />
         <View style={styles.rowDivider} />
-        <DocRow label="Name" value={name ?? "User"} />
+        <DocRow icon="calendar" label="Age" value={age ?? "-"} />
+        <View style={styles.rowDivider} />
+        <DocRow icon="globe" label="Region" value="India" />
       </Card>
 
+      {/* Sign out */}
       <View style={styles.signOutRow}>
         <AppButton
           title="Sign Out"
@@ -90,6 +123,8 @@ export default function DashboardScreen() {
           variant="ghost"
         />
       </View>
+
+      <Text style={styles.footerHint}>Inova v1.0.0</Text>
     </ScrollView>
   );
 }
@@ -103,55 +138,97 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   pageHeader: {
-    marginBottom: 32,
+    marginBottom: 28,
+  },
+  greeting: {
+    fontSize: 14,
+    fontFamily: "Inter_400Regular",
+    color: COLORS.muted,
+    marginBottom: 4,
   },
   pageTitle: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: "Inter_700Bold",
     color: COLORS.text,
     letterSpacing: -0.5,
-    marginBottom: 4,
   },
-  pageSubtitle: {
-    fontSize: 15,
+
+  /* Stats row */
+  statsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 32,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 14,
+    alignItems: "flex-start",
+    gap: 6,
+  },
+  statIconWrap: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: COLORS.accentLight,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 2,
+  },
+  statValue: {
+    fontSize: 16,
+    fontFamily: "Inter_700Bold",
+    color: COLORS.text,
+  },
+  statLabel: {
+    fontSize: 11,
     fontFamily: "Inter_400Regular",
     color: COLORS.muted,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
+
+  /* Section title */
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: "Inter_600SemiBold",
     color: COLORS.muted,
-    letterSpacing: 0.8,
+    letterSpacing: 1,
     textTransform: "uppercase",
     marginBottom: 10,
   },
+
+  /* Profile card */
   profileCard: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   avatarRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 16,
+    gap: 14,
   },
   avatar: {
-    width: 52,
-    height: 52,
+    width: 48,
+    height: 48,
     borderRadius: 14,
     backgroundColor: COLORS.accent,
     alignItems: "center",
     justifyContent: "center",
   },
   avatarText: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: "Inter_700Bold",
-    color: "#fff",
+    color: COLORS.base,
   },
   profileText: {
     flex: 1,
-    gap: 4,
+    gap: 3,
   },
   profileName: {
-    fontSize: 18,
+    fontSize: 17,
     fontFamily: "Inter_700Bold",
     color: COLORS.text,
   },
@@ -160,8 +237,22 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_400Regular",
     color: COLORS.muted,
   },
+  badge: {
+    backgroundColor: COLORS.successBg,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontFamily: "Inter_600SemiBold",
+    color: COLORS.success,
+    letterSpacing: 0.3,
+  },
+
+  /* Details card */
   detailsCard: {
-    marginBottom: 32,
+    marginBottom: 28,
     paddingVertical: 0,
     paddingHorizontal: 20,
   },
@@ -169,7 +260,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 16,
+    paddingVertical: 15,
+  },
+  docLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   docLabel: {
     fontSize: 14,
@@ -189,7 +285,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
     marginHorizontal: -20,
   },
+
+  /* Footer */
   signOutRow: {
-    marginTop: 8,
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  footerHint: {
+    fontSize: 11,
+    fontFamily: "Inter_400Regular",
+    color: COLORS.borderStrong,
+    textAlign: "center",
   },
 });

@@ -1,18 +1,22 @@
 export const COLORS = {
-  base: "#F4F6F8",
-  surface: "#FFFFFF",
-  accent: "#3B82F6",
-  accentLight: "#EFF6FF",
-  text: "#0F172A",
-  textSecondary: "#334155",
-  muted: "#64748B",
-  border: "#E2E8F0",
-  borderStrong: "#CBD5E1",
-  danger: "#DC2626",
-  dangerBg: "#FEF2F2",
-  inputBg: "#F1F5F9",
-  success: "#16A34A",
-  successBg: "#DCFCE7",
+  // 60% — Deep blue-black base
+  base: "#0F1117",
+  // 30% — Cool slate surfaces
+  surface: "#1A1D27",
+  // 10% — Warm amber accent
+  accent: "#E8A55D",
+  accentLight: "#1F1B15",
+  text: "#E4E4E7",
+  textSecondary: "#A1A1AA",
+  muted: "#6B7280",
+  border: "#252830",
+  borderStrong: "#363B47",
+  danger: "#F87171",
+  dangerBg: "#2D1B1B",
+  inputBg: "#141620",
+  success: "#4ADE80",
+  successBg: "#132215",
+  focusBlue: "#E8A55D",
 };
 
 export default {

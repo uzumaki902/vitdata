@@ -35,7 +35,7 @@ export default function AppInput({
           secureTextEntry={hidden}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholderTextColor="#94A3B8"
+          placeholderTextColor={COLORS.muted}
           autoCapitalize="none"
           {...rest}
         />
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   rowFocused: {
     backgroundColor: COLORS.surface,
-    borderColor: COLORS.accent,
+    borderColor: COLORS.focusBlue,
   },
   rowError: {
     borderColor: COLORS.danger,

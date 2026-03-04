@@ -47,7 +47,7 @@ export default function LoginScreen() {
 
     await new Promise<void>((r) => setTimeout(r, 700));
 
-    if (email.trim() === DUMMY_USER.email && pass === DUMMY_USER.password) {
+    if (email.trim() === DUMMY_USER.email && pass.trim() === DUMMY_USER.password) {
       router.push({
         pathname: "/dashboard",
         params: { name: DUMMY_USER.name, email: email.trim(), age: DUMMY_USER.age },

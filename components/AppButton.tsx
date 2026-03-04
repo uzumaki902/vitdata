@@ -69,7 +69,7 @@ export default function AppButton({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? "#fff" : COLORS.accent} size="small" />
+        <ActivityIndicator color={isPrimary ? "#0F1117" : COLORS.accent} size="small" />
       ) : (
         <Text style={[styles.txt, isPrimary ? styles.txtPrimary : styles.txtGhost]}>
           {title}
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   txtPrimary: {
-    color: "#fff",
+    color: "#0F1117",
   },
   txtGhost: {
     color: COLORS.textSecondary,
